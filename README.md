@@ -31,6 +31,8 @@ The failure mode that motivated this tool: a repository reorganised its `docs/` 
 
 The moves were the easy part. The part worth automating is everything that pointed at them.
 
+That reorganisation is written up in more detail in [this architecture case study](https://github.com/Jaswanthnani02/client-intelligence-platform), which is where this tool came from.
+
 A week later a second change landed that added a link to a file which had since moved to the repository root. Git carried the edit across the rename correctly and produced no conflict, so the link was quietly wrong. This check caught it in six seconds.
 
 ## Why relative links only
