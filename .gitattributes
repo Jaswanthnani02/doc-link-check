@@ -1,0 +1,13 @@
+# Normalise line endings in the repository regardless of the platform a
+# contributor works on. Without this, a Windows checkout commits CRLF and
+# every subsequent diff on a Unix machine shows the whole file as changed.
+* text=auto eol=lf
+
+*.py    text eol=lf
+*.md    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+
+# Keep the test corpus and docs out of GitHub's language statistics, so the
+# repository is identified as Python rather than Markdown.
+tests/* linguist-detectable=false

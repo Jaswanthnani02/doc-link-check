@@ -1,5 +1,9 @@
 # doc-link-check
 
+[![check](https://github.com/Jaswanthnani02/doc-link-check/actions/workflows/check.yml/badge.svg)](https://github.com/Jaswanthnani02/doc-link-check/actions/workflows/check.yml)
+[![python](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/downloads/)
+[![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 Verify that every relative link in your Markdown resolves. One file, no dependencies, no network.
 
 ```console
@@ -42,7 +46,7 @@ If you also want external link checking, use a dedicated tool for it on a nightl
 There is nothing to install. Copy `doc_link_check.py` into your repository and run it with Python 3.9 or newer.
 
 ```bash
-curl -O https://raw.githubusercontent.com/<you>/doc-link-check/main/doc_link_check.py
+curl -O https://raw.githubusercontent.com/Jaswanthnani02/doc-link-check/main/doc_link_check.py
 python doc_link_check.py
 ```
 
@@ -125,10 +129,14 @@ Worth making this its own workflow rather than a job inside your main CI. Wideni
 ## Development
 
 ```bash
+pip install pytest
 python -m pytest tests/ -q
+python doc_link_check.py --check-anchors   # run it against this repo
 ```
 
-30 tests, no dependencies beyond `pytest`. Each builds a throwaway directory tree, so nothing depends on the repository the tests happen to live in.
+38 tests, no dependencies beyond `pytest`. Each builds a throwaway directory tree, so nothing depends on the repository the tests happen to live in. CI runs them on Python 3.9, 3.11 and 3.13.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for scope and what a good change looks like, and [CHANGELOG.md](CHANGELOG.md) for release history.
 
 ## Licence
 
