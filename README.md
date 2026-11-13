@@ -3,6 +3,7 @@
 [![check](https://github.com/Jaswanthnani02/doc-link-check/actions/workflows/check.yml/badge.svg)](https://github.com/Jaswanthnani02/doc-link-check/actions/workflows/check.yml)
 [![python](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/downloads/)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![dependencies](https://img.shields.io/badge/dependencies-none-brightgreen)](doc_link_check.py)
 
 Verify that every relative link in your Markdown resolves. One file, no dependencies, no network.
 
@@ -58,7 +59,9 @@ Keeping it as a single vendored file is deliberate: a documentation check should
 
 ```console
 $ python doc_link_check.py --help
-usage: doc-link-check [-h] [--ignore DIR] [--no-git] [--check-anchors] [--quiet] [root]
+usage: doc-link-check [-h] [--ignore DIR] [--no-git] [--check-anchors]
+                      [--quiet] [--version]
+                      [root]
 ```
 
 | Option | Effect |
@@ -68,10 +71,37 @@ usage: doc-link-check [-h] [--ignore DIR] [--no-git] [--check-anchors] [--quiet]
 | `--no-git` | Walk the filesystem instead of asking git which files are tracked. |
 | `--check-anchors` | Also verify that `#fragments` match a heading in the target file. |
 | `--quiet` | Print nothing on success. Useful in pre-commit hooks. |
+| `--version` | Print the version and exit. |
 
 By default the tool asks `git ls-files` which Markdown is tracked, so ignored and untracked files are skipped for free. It falls back to walking the filesystem when git is unavailable or the directory is not a checkout.
 
 Skipped by default: `.git`, `.venv`, `venv`, `node_modules`, `__pycache__`, `.tox`, `.mypy_cache`, `.pytest_cache`, `vendor`, `dist`, `build`.
+
+## How it works
+
+```mermaid
+flowchart TD
+    ROOT(["root, default ."]) --> FIND{"git ls-files<br/>available?"}
+    FIND -->|yes| GIT["Tracked .md and .markdown files"]
+    FIND -->|"no, or --no-git"| WALK["Walk the filesystem,<br/>skipping ignored directories"]
+    GIT --> STRIP["Blank out fenced blocks and inline code,<br/>keeping line numbers"]
+    WALK --> STRIP
+    STRIP --> LINKS["Extract inline links, images<br/>and reference definitions"]
+    LINKS --> EXT{"External?<br/>http, https, mailto, tel, ftp, //"}
+    EXT -->|yes| SKIP["Skipped, not counted"]
+    EXT -->|no| RES{"Path resolves relative<br/>to the linking file?"}
+    RES -->|no| BROKEN["Broken: file does not exist"]
+    RES -->|yes| ANC{"--check-anchors and<br/>a #fragment?"}
+    ANC -->|no| OK["OK"]
+    ANC -->|yes| HEAD{"Matches a heading slug<br/>or an a id?"}
+    HEAD -->|yes| OK
+    HEAD -->|no| BROKEN2["Broken: no such heading"]
+    BROKEN --> EXIT["Exit 1 with file:line list"]
+    BROKEN2 --> EXIT
+    OK --> EXIT0["Exit 0 when nothing is broken"]
+```
+
+Exit code 2 means the root is not a directory. A project with no Markdown files exits 0 with a note on stderr.
 
 ## What it checks
 
